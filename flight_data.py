@@ -20,6 +20,7 @@ class FlightData:
         self.arrival_airport_code = None
         self.date_to_fly = None
         self.date_comeback_fly = None
+        self.booking_token = None
 
     def search_fly(self, departure_iata, destination_iata, trip_days):
         """ Take Departure IATA Code, Destination IATA Code, Trip Days
@@ -51,3 +52,4 @@ class FlightData:
         self.arrival_city = self.result["cityTo"]
         self.date_to_fly = self.result["local_departure"]
         self.date_comeback_fly = self.result["route"][1]["utc_departure"]
+        self.deep_link = self.result["deep_link"]

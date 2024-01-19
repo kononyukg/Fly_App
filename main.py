@@ -16,7 +16,9 @@ API_KEY = os.environ.get("API_KEY")
 ACCOUNT_SID = os.environ.get("ACCOUNT_SID")
 AUTH_TOKEN = os.environ.get("AUTH_TOKEN")
 TWILIO_PHONE_NUMBER = os.environ.get("TWILIO_PHONE_NUMBER")
-YOU_PHONE_NUMBER = os.environ.get("YOU_PHONE_NUMBER")
+YOUR_PHONE_NUMBER = os.environ.get("YOUR_PHONE_NUMBER")
+YOUR_EMAIL_SMTP =  os.environ.get("YOUR_EMAIL_SMTP")
+YOUR_PASSWORD_SMTP =  os.environ.get("YOUR_PASSWORD_SMTP")
 
 
 """ Connect to the Google Sheet, run interface and add user requests,
@@ -50,27 +52,6 @@ for data in sheet_data:
     data["returnDate"] = flight_data.date_comeback_fly.split("T", 1)[0]
     data["lowestPrice"] = flight_data.price
 data_manager.update_sheet(sheet_data)
-# ------------------------------------------------------------------------------------------
-
-# def send_feedback():
-#     """ chek prices and send message """
-#     flight_data = FlightData(API_KEY, TEQ_SEARCH_API)
-#     for data in sheet_data:
-#         city = f"city:{data['iataCode']}"
-#         flight_data.search_fly(city)
-#         price = flight_data.price
-#         if price < data["lowestPrice"]:
-#             departure_city = flight_data.departure_city
-#             departure_airport_code = flight_data.departure_airport_code
-#             arrival_city = flight_data.arrival_city
-#             arrival_airport_code = flight_data.arrival_airport_code
-#             date_to_fly = flight_data.date_to_fly.split("T", 1)[0]
-#             date_comeback_fly = flight_data.date_comeback_fly.split("T", 1)[0]
-#             message = f"Low price alert! Only £{price} to fly from\n{departure_city}-{departure_airport_code} to {arrival_city}-{arrival_airport_code},\nfrom {date_to_fly} to {date_comeback_fly}."
-#             notification_manager = NotificationManager(ACCOUNT_SID, AUTH_TOKEN, message, TWILIO_PHONE_NUMBER, YOU_PHONE_NUMBER)
-#             notification_manager.send_message()
-
-# ------------------------------------------------------------------------------------------
             
 
 # def main():
