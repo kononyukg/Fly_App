@@ -2,14 +2,15 @@ import requests
 
 
 class IataSearch:
+    
     def __init__(self, api_key, teq_location_api):
-        """ class to connect with the Flight Locations API """
+        """ Class to connect with the Flight Locations API """
         self.city = None
         self.teq_location_api = teq_location_api
         self.api_key = api_key
 
     def iata_for_city(self, city_name):
-        """ take name of city and search iata code for it """
+        """ Take name of city and search iata code for it """
         self.city = city_name
         headers = {
            "apikey": self.api_key

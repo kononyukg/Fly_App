@@ -3,6 +3,7 @@ import requests
 
 
 class FlightData:
+    
     def __init__(self, api_key, teq_search_api):
         """ class to connect with the Flight Search API """
         self.teq_search_api = teq_search_api

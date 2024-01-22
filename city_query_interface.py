@@ -1,21 +1,22 @@
 from tkinter import *
+import webbrowser
 
 FONT = ("Arial", 20, "bold")
 COLOR = "#C5FFF8"
 YOUR_CITY = "Gdansk"
-YOUR_CAPITAL = "Warsaw"
 
 class CityQueryInterface():
 
-    def __init__(self,sheet_list, funk_to_upload):
+    def __init__(self, sheet_list, funk_to_upload, sheet_url):
         """ Window """
+        self.sheet_url = sheet_url
         self.funk_to_upload = funk_to_upload
         self.sheet_list = sheet_list
         self.window = Tk()
         self.window.title("Fly Alert")
         self.window.config(padx=50, pady=50, bg="#C5FFF8")
         self.canvas = Canvas(width=600, height=500, bg=COLOR, highlightthickness=0)
-        self.plane_img = PhotoImage(file="plane.png")
+        self.plane_img = PhotoImage(file="img/plane.png")
         self.canvas.create_image(300, 250, image=self.plane_img)
         self.canvas.create_text(
             290, 
@@ -42,7 +43,9 @@ class CityQueryInterface():
         self.how_many_days_entry.grid(row=3, column=1)
         """ Buttons """
         self.city_from_button = Button(text="ADD Data", font=FONT, width=12, command=self.add_user_data)
-        self.city_from_button.grid(row=1,column=2, rowspan=3)
+        self.city_from_button.grid(row=1,column=2)
+        self.go_to_sheet_button = Button(text="Open Sheet", font=FONT, width=12, command=self.go_to_sheet)
+        self.go_to_sheet_button.grid(row=3,column=2)
 
         self.window.mainloop()
         
@@ -55,3 +58,7 @@ class CityQueryInterface():
         self.city_from_entry.delete(0, "end")
         self.city_to_entry.delete(0, "end")
         self.how_many_days_entry.delete(0, "end")
+        self.city_from_entry.insert(0, YOUR_CITY)
+
+    def go_to_sheet(self):
+        webbrowser.open(self.sheet_url)
