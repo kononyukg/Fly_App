@@ -22,6 +22,17 @@ YOUR_PASSWORD_SMTP = os.environ.get("YOUR_PASSWORD_SMTP")
 YOUR_SHEET_URL = os.environ.get("YOUR_SHEET_URL")
 
 
+def send_feedback(message, departure_city, destination_city, url):
+        """ Func to connect with notification_manager and 
+        to send message and email """
+        notification_manager = NotificationManager(message)
+        notification_manager.send_message(
+            ACCOUNT_SID, AUTH_TOKEN, TWILIO_PHONE_NUMBER, YOUR_PHONE_NUMBER)
+        notification_manager.send_email(
+            YOUR_EMAIL_SMTP, YOUR_PASSWORD_SMTP, 
+            departure_city, destination_city, url)
+        
+
 def main():
     """ Connect to the Google Sheet, run interface and add user requests,
     then get upgrade date from Google Sheet """
@@ -42,17 +53,6 @@ def main():
         if data["destinationIataCode"] == "":
             destination_city = data["destinationCity"]
             data["destinationIataCode"] = iata_search.iata_for_city(destination_city)
-
-
-    def send_feedback(message, departure_city, destination_city, url):
-        """ Func to connect with notification_manager and 
-        to send message and email """
-        notification_manager = NotificationManager(message)
-        notification_manager.send_message(
-            ACCOUNT_SID, AUTH_TOKEN, TWILIO_PHONE_NUMBER, YOUR_PHONE_NUMBER)
-        notification_manager.send_email(
-            YOUR_EMAIL_SMTP, YOUR_PASSWORD_SMTP, 
-            departure_city, destination_city, url)
         
 
     """ Find flights with user's parameters """
