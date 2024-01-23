@@ -58,7 +58,9 @@ class CityQueryInterface():
         self.city_from_button = Button(text="ADD Data", font=FONT, width=12, command=self.add_user_data)
         self.city_from_button.grid(row=1,column=2)
         self.go_to_sheet_button = Button(text="Open Sheet", font=FONT, width=12, command=self.go_to_sheet)
-        self.go_to_sheet_button.grid(row=3,column=2)
+        self.go_to_sheet_button.grid(row=2,column=2)
+        self.close_button = Button(text="Let's search", font=FONT, width=12, command=self.window.destroy)
+        self.close_button.grid(row=3,column=2)
 
         self.window.mainloop()
         
@@ -81,5 +83,5 @@ class CityQueryInterface():
     def go_to_sheet(self):
         webbrowser.open(self.sheet_url)
 
-    def show_eror(self, title_eror, message_eror):
-        messagebox.showinfo(title=title_eror, message=message_eror)
+    def show_error(self, title_error, message_error):
+        messagebox.showinfo(title=title_error, message=message_error)

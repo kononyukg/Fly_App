@@ -40,8 +40,9 @@ def send_feedback(message, departure_city, destination_city, url):
             departure_city, destination_city, url)
 
 
-def check_prices(data, sh_data):
-    """ Check and add dates and prices to the Google Sheet, then send SMS and Email """
+def check_prices(data):
+    """ Check and add dates and prices to the Google Sheet, 
+    then send SMS and Email """
     if data["lowestPrice"] == "":
         data["lowestPrice"] = 0
     if flight_data.price < int(data["lowestPrice"]) or data["lowestPrice"] == 0:
@@ -61,13 +62,17 @@ def check_prices(data, sh_data):
                         f" to {city_to}-{airport_iata_to},"
                         f"\nfrom {date_to} to {date_back}.")
         send_feedback(message_to_send, city_from, city_to, deep_link)
-        data_manager.update_sheet(sh_data)
 
 
 def get_date_from_sheet():
     """ Connect and retutn date from the Google Sheet """
-    sheet_data = data_manager.get_trips()
-    return sheet_data
+    try:
+        sheet_data = data_manager.get_trips()
+        return sheet_data
+    except KeyError:
+        title = "Error"
+        message = ("You used the limit of 200 requests per month.")
+        city_query_interface.show_error(title, message)
 
 
 def get_iata_codes(sh_data):
@@ -82,27 +87,33 @@ def get_iata_codes(sh_data):
     return sh_data
         
 
-def find_flight3(sh_data):
+def find_flight(sh_data):
     """ Find flights with user's parameters """
     for data in sh_data:
-        departure_iata = data["departureIataCode"]
-        destination_iata = data["destinationIataCode"]
-        trip_days = data["tripDays"]
-        row = data["id"]
         try:
+            departure_iata = data["departureIataCode"]
+            destination_iata = data["destinationIataCode"]
+            trip_days = data["tripDays"]
             flight_data.search_fly(
                 departure_iata, destination_iata, trip_days)
+            check_prices(data)
+            data_manager.update_sheet(sh_data)    
         except IndexError:
             title = "Sorry"
             message = ("There are no direct flights in this direction"
-                       "\nPlease enter another destination city")
+                       "\nPlease enter another destination city.")
             city_query_interface.show_eror(title, message)
+            continue
+    for data in sh_data:
+        if  data["lowestPrice"] == "":
+            row = data["id"]
             data_manager.delete_row(row)
-        finally:
-            check_prices(data, sh_data)
-    
 
-if __name__ == "__main__":
+
+def main():
     sheet_data = get_date_from_sheet()
     updated_sheet_data = get_iata_codes(sheet_data)
-    find_flight3(updated_sheet_data)
+    find_flight(updated_sheet_data)
+
+if __name__ == "__main__":
+    main()
