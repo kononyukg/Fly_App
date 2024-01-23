@@ -1,5 +1,6 @@
 from tkinter import *
 import webbrowser
+from tkinter import messagebox
 
 FONT = ("Arial", 20, "bold")
 COLOR = "#C5FFF8"
@@ -7,11 +8,23 @@ YOUR_CITY = "Gdansk"
 
 class CityQueryInterface():
 
-    def __init__(self, sheet_list, funk_to_upload, sheet_url):
+    def __init__(self, funk_to_upload, sheet_url):
         """ Window """
         self.sheet_url = sheet_url
         self.funk_to_upload = funk_to_upload
-        self.sheet_list = sheet_list
+        self.sheet_list = [
+                {
+                    'departureCity': '', 
+                    'departureIataCode': '', 
+                    'destinationCity': '', 
+                    'destinationIataCode': '', 
+                    'departureDate': '', 
+                    'returnDate': '', 
+                    'tripDays': '', 
+                    'lowestPrice': '', 
+                    'id': ''
+                    }
+                ]
         self.window = Tk()
         self.window.title("Fly Alert")
         self.window.config(padx=50, pady=50, bg="#C5FFF8")
@@ -54,11 +67,19 @@ class CityQueryInterface():
         city_from = self.city_from_entry.get().title()
         city_to =  self.city_to_entry.get().title()
         days = self.how_many_days_entry.get()
-        self.funk_to_upload(self.sheet_list, city_from, city_to, days)
-        self.city_from_entry.delete(0, "end")
-        self.city_to_entry.delete(0, "end")
-        self.how_many_days_entry.delete(0, "end")
-        self.city_from_entry.insert(0, YOUR_CITY)
+        if len(city_from) == 0 or len(city_to) == 0 or len(days) == 0:
+            title = "Information"
+            message = "ALL fields are required"
+            messagebox.showinfo(title=title, message=message)
+        else:
+            self.funk_to_upload(self.sheet_list, city_from, city_to, days)
+            self.city_from_entry.delete(0, "end")
+            self.city_to_entry.delete(0, "end")
+            self.how_many_days_entry.delete(0, "end")
+            self.city_from_entry.insert(0, YOUR_CITY)
 
     def go_to_sheet(self):
         webbrowser.open(self.sheet_url)
+
+    def show_eror(self, title_eror, message_eror):
+        messagebox.showinfo(title=title_eror, message=message_eror)

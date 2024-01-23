@@ -8,19 +8,6 @@ class DataManager:
          when Google Sheet is empty, requests.get return 
          an empty list """
         self.sheet_data = None
-        self.sheet_for_run = [
-                {
-                    'departureCity': '', 
-                    'departureIataCode': '', 
-                    'destinationCity': '', 
-                    'destinationIataCode': '', 
-                    'departureDate': '', 
-                    'returnDate': '', 
-                    'tripDays': '', 
-                    'lowestPrice': '', 
-                    'id': ''
-                    }
-                ]
         self.sheet_endpoint = sheet_endpoint
         self.response_sheet = None
 
@@ -60,4 +47,6 @@ class DataManager:
             }
             requests.post(url=update_url, json=update_inputs)
 
-        
+    def delete_row(self, row_id):
+         update_url = f"{self.sheet_endpoint}/{row_id}"
+         requests.delete(url=update_url)

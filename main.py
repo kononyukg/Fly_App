@@ -21,6 +21,13 @@ YOUR_EMAIL_SMTP = os.environ.get("YOUR_EMAIL_SMTP")
 YOUR_PASSWORD_SMTP = os.environ.get("YOUR_PASSWORD_SMTP")
 YOUR_SHEET_URL = os.environ.get("YOUR_SHEET_URL")
 
+data_manager = DataManager(SHEET_ENDPOINT)
+city_query_interface = CityQueryInterface(
+        data_manager.upload_user_request, 
+        YOUR_SHEET_URL)
+iata_search = IataSearch(API_KEY, TEQ_LOCATION_API)
+flight_data = FlightData(API_KEY, TEQ_SEARCH_API)
+
 
 def send_feedback(message, departure_city, destination_city, url):
         """ Func to connect with notification_manager and 
@@ -31,61 +38,71 @@ def send_feedback(message, departure_city, destination_city, url):
         notification_manager.send_email(
             YOUR_EMAIL_SMTP, YOUR_PASSWORD_SMTP, 
             departure_city, destination_city, url)
-        
 
-def main():
-    """ Connect to the Google Sheet, run interface and add user requests,
-    then get upgrade date from Google Sheet """
-    data_manager = DataManager(SHEET_ENDPOINT)
-    sheet_data = data_manager.sheet_for_run
-    CityQueryInterface(
-        sheet_data, data_manager.upload_user_request, 
-        YOUR_SHEET_URL)
+
+def check_prices(data, sh_data):
+    """ Check and add dates and prices to the Google Sheet, then send SMS and Email """
+    if data["lowestPrice"] == "":
+        data["lowestPrice"] = 0
+    if flight_data.price < int(data["lowestPrice"]) or data["lowestPrice"] == 0:
+        data["departureDate"] = flight_data.date_to_fly.split("T", 1)[0]
+        data["returnDate"] = flight_data.date_comeback_fly.split("T", 1)[0]
+        data["lowestPrice"] = flight_data.price
+        price = data["lowestPrice"]
+        city_from = data["departureCity"]
+        airport_iata_from = flight_data.departure_airport_code
+        city_to = data["destinationCity"]
+        airport_iata_to = flight_data.arrival_airport_code
+        date_to = data["departureDate"]
+        date_back = data["returnDate"]
+        deep_link = flight_data.deep_link
+        message_to_send = (f"Low price alert! Only {price} EUR to fly," 
+                        f"\nfrom {city_from}-{airport_iata_from}"
+                        f" to {city_to}-{airport_iata_to},"
+                        f"\nfrom {date_to} to {date_back}.")
+        send_feedback(message_to_send, city_from, city_to, deep_link)
+        data_manager.update_sheet(sh_data)
+
+
+def get_date_from_sheet():
+    """ Connect and retutn date from the Google Sheet """
     sheet_data = data_manager.get_trips()
+    return sheet_data
 
 
+def get_iata_codes(sh_data):
     """ Update date from Google Sheet for IATA codes """
-    iata_search = IataSearch(API_KEY, TEQ_LOCATION_API)
-    for data in sheet_data:
+    for data in sh_data:
         if data["departureIataCode"] == "":
             departure_city = data["departureCity"]
             data["departureIataCode"] = iata_search.iata_for_city(departure_city)
         if data["destinationIataCode"] == "":
             destination_city = data["destinationCity"]
             data["destinationIataCode"] = iata_search.iata_for_city(destination_city)
+    return sh_data
         
 
+def find_flight3(sh_data):
     """ Find flights with user's parameters """
-    flight_data = FlightData(API_KEY, TEQ_SEARCH_API)
-    for data in sheet_data:
+    for data in sh_data:
         departure_iata = data["departureIataCode"]
         destination_iata = data["destinationIataCode"]
         trip_days = data["tripDays"]
-        flight_data.search_fly(
-            departure_iata, destination_iata, trip_days)
-        """ Update Google Sheet for dates and prices from Flight_data 
-        if there are lower then in Google Sheet or don't exist """
-        if data["lowestPrice"] == "":
-            data["lowestPrice"] = 0
-        if flight_data.price < int(data["lowestPrice"]) or data["lowestPrice"] == 0:
-            data["departureDate"] = flight_data.date_to_fly.split("T", 1)[0]
-            data["returnDate"] = flight_data.date_comeback_fly.split("T", 1)[0]
-            data["lowestPrice"] = flight_data.price
-            price = data["lowestPrice"]
-            city_from = data["departureCity"]
-            airport_iata_from = flight_data.departure_airport_code
-            city_to = data["destinationCity"]
-            airport_iata_to = flight_data.arrival_airport_code
-            date_to = data["departureDate"]
-            date_back = data["returnDate"]
-            deep_link = flight_data.deep_link
-            message_to_send = (f"Low price alert! Only {price} euro to fly," 
-                            f"\nfrom {city_from}-{airport_iata_from}"
-                            f" to {city_to}-{airport_iata_to},"
-                            f"\nfrom {date_to} to {date_back}.")
-            send_feedback(message_to_send, city_from, city_to, deep_link)
-            data_manager.update_sheet(sheet_data)
-
+        row = data["id"]
+        try:
+            flight_data.search_fly(
+                departure_iata, destination_iata, trip_days)
+        except IndexError:
+            title = "Sorry"
+            message = ("There are no direct flights in this direction"
+                       "\nPlease enter another destination city")
+            city_query_interface.show_eror(title, message)
+            data_manager.delete_row(row)
+        finally:
+            check_prices(data, sh_data)
+    
 
 if __name__ == "__main__":
-    main()
+    sheet_data = get_date_from_sheet()
+    updated_sheet_data = get_iata_codes(sheet_data)
+    find_flight3(updated_sheet_data)
