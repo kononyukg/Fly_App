@@ -5,6 +5,7 @@ from data_manager import DataManager
 from iata_search import IataSearch
 from flight_data import FlightData
 from notification_manager import NotificationManager
+import threading
 
 
 load_dotenv()
@@ -28,10 +29,21 @@ class AppBrain:
         self.data_manager = DataManager(SHEET_ENDPOINT)
         self.city_query_interface = CityQueryInterface(
                 self.data_manager.upload_user_request, 
-                YOUR_SHEET_URL, self.fly_alert)
+                YOUR_SHEET_URL, self.run_code_search_flights)
         self.iata_search = IataSearch(API_KEY, TEQ_LOCATION_API)
         self.flight_data = FlightData(API_KEY, TEQ_SEARCH_API)
-
+        self.show_in_iterface()
+    
+    def show_in_iterface(self):
+        data_to_interface = self.data_manager.get_trips()
+        for data in data_to_interface:
+            if len(data_to_interface) == 0:
+                pass
+            else:
+                try:
+                    self.city_query_interface.sheet_to_table(data)
+                except:
+                    continue
 
     def send_feedback(self, message, departure_city, destination_city, url):
             """ Func to connect with notification_manager and 
@@ -75,6 +87,7 @@ class AppBrain:
             title = "Error"
             message = ("You used the limit of 200 requests per month.")
             self.city_query_interface.show_error(title, message)
+
     def get_iata_codes(self, sh_data):
         """ Update date from Google Sheet for IATA codes """
         for data in sh_data:
@@ -93,10 +106,24 @@ class AppBrain:
                 departure_iata = data["departureIataCode"]
                 destination_iata = data["destinationIataCode"]
                 trip_days = data["tripDays"]
-                self.flight_data.search_fly(
-                    departure_iata, destination_iata, trip_days)
-                self.check_prices(data)
-                self.data_manager.update_sheet(sh_data)    
+                self.flight_data_search_fly_thread = threading.Thread(
+                    target=self.flight_data.search_fly,
+                    args=(departure_iata, destination_iata, trip_days,)
+                    )
+                self.flight_data_search_fly_thread.start()
+                self.flight_data_search_fly_thread.join()
+                self.check_prices_thread = threading.Thread(
+                    target=self.check_prices,
+                    args=(data,)
+                    )
+                self.check_prices_thread.start()
+                self.check_prices_thread.join()
+                self.data_manager_update_sheet_thread = threading.Thread(
+                    target=self.data_manager.update_sheet,
+                    args=(sh_data,)
+                )
+                self.data_manager_update_sheet_thread.start()
+                self.data_manager_update_sheet_thread.join()     
             except IndexError:
                 title = "Sorry"
                 message = ("There are no direct flights in this direction"
@@ -108,8 +135,16 @@ class AppBrain:
                 row = data["id"]
                 self.data_manager.delete_row(row)
 
-    def fly_alert(self):
+    def run_code_search_flights(self):
         """ Run code when you tap 'search' in interface """
+        self.city_query_interface.table_data.delete("0.0", "end")
+        self.city_query_interface.table_new.delete("0.0", "end")
         sheet_data = self.get_date_from_sheet()
         updated_sheet_data = self.get_iata_codes(sheet_data)
-        self.find_flight(updated_sheet_data)
+        self.find_flight_thread = threading.Thread(
+            target=self.find_flight,
+            args=(updated_sheet_data,)
+        )
+        self.find_flight_thread.start()
+        self.find_flight_thread.join() 
+        self.show_in_iterface()

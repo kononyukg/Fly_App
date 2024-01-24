@@ -100,6 +100,7 @@ class CityQueryInterface(customtkinter.CTk):
         messagebox.showinfo(title=title_error, message=message_error)
 
     def sheet_to_table(self, data):
+        """ Take data from Google sheet and show it in interface """
         city_from = data['departureCity']
         iata_from = data['departureIataCode']
         city_to = data['destinationCity']
@@ -109,4 +110,12 @@ class CityQueryInterface(customtkinter.CTk):
         days = data['tripDays']
         cost = data['lowestPrice']
         id = data['id']
-        self.table_data.insert("0.0", f"Departure City: {city_from}\nDeparture Iata Code: {iata_from}\nDestination City: {city_to}\nDestination Iata Code: {iata_to}\nDeparture Date: {date_from}\nReturn Date: {date_back}\nTrip Days: {days}\nLowest Price: {cost}\nId: {id}\n\n")
+        self.table_data.insert("0.0", f"Departure City:   {city_from}\n"
+                               f"Departure Iata Code:   {iata_from}\n"
+                               f"Destination City:   {city_to}\n"
+                               f"Destination Iata Code:   {iata_to}\n"
+                               f"Departure Date:   {date_from}\n"
+                               f"Return Date:   {date_back}\n"
+                               f"Trip Days:   {days}\n"
+                               f"Lowest Price:   {cost}\n"
+                               f"Id:   {id}\n\n")
