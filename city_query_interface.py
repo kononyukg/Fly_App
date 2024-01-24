@@ -1,17 +1,18 @@
 from tkinter import *
 import webbrowser
 from tkinter import messagebox
+import customtkinter
 
-FONT = ("Arial", 20, "bold")
-COLOR = "#C5FFF8"
-YOUR_CITY = "Gdansk"
+customtkinter.set_appearance_mode("dark")
+customtkinter.set_default_color_theme("green")
 
-class CityQueryInterface():
 
-    def __init__(self, funk_to_upload, sheet_url):
-        """ Window """
+class CityQueryInterface(customtkinter.CTk):
+    def __init__(self, funk_to_upload, sheet_url, funk_to_start):
+        super().__init__()
         self.sheet_url = sheet_url
         self.funk_to_upload = funk_to_upload
+        self.funk_to_start = funk_to_start
         self.sheet_list = [
                 {
                     'departureCity': '', 
@@ -25,44 +26,56 @@ class CityQueryInterface():
                     'id': ''
                     }
                 ]
-        self.window = Tk()
-        self.window.title("Fly Alert")
-        self.window.config(padx=50, pady=50, bg="#C5FFF8")
-        self.canvas = Canvas(width=600, height=500, bg=COLOR, highlightthickness=0)
-        self.plane_img = PhotoImage(file="img/plane.png")
-        self.canvas.create_image(300, 250, image=self.plane_img)
-        self.canvas.create_text(
-            290, 
-            150, 
-            text="Please enter\n the request",  
-            font=("Arial", 50, "bold"), fill="black"
-            )
-        self.canvas.grid(row=0, column=0, columnspan=3)
-        """ Labels """
-        self.city_from_label = Label(text="From City:", font=FONT, bg=COLOR)
-        self.city_from_label.grid(row=1, column=0)
-        self.city_to_label = Label(text="To City:", font=FONT, bg=COLOR)
-        self.city_to_label.grid(row=2, column=0)
-        self.how_many_days_label = Label(text="How long:", font=FONT, bg=COLOR)
-        self.how_many_days_label.grid(row=3, column=0)
-        """ Entries """
-        self.city_from_entry = Entry(width=12, font=FONT)
-        self.city_from_entry.grid(row=1, column=1)
-        self.city_from_entry.insert(0, YOUR_CITY)
-        self.city_from_entry.focus()
-        self.city_to_entry = Entry(width=12, font=FONT)
-        self.city_to_entry.grid(row=2, column=1)
-        self.how_many_days_entry = Entry(width=12, font=FONT)
-        self.how_many_days_entry.grid(row=3, column=1)
-        """ Buttons """
-        self.city_from_button = Button(text="ADD Data", font=FONT, width=12, command=self.add_user_data)
-        self.city_from_button.grid(row=1,column=2)
-        self.go_to_sheet_button = Button(text="Open Sheet", font=FONT, width=12, command=self.go_to_sheet)
-        self.go_to_sheet_button.grid(row=2,column=2)
-        self.close_button = Button(text="Let's search", font=FONT, width=12, command=self.window.destroy)
-        self.close_button.grid(row=3,column=2)
+        
+        """ Window """
+        self.title("Fly Alert")
+        self.geometry("1000x920")
+        self.config(padx=20, pady=20)
+        self.logo_label = customtkinter.CTkLabel(self, text="Please enter data of your trip", font=customtkinter.CTkFont(size=50, weight="bold"))
+        self.logo_label.grid(row=0, column=0, sticky="nsew", padx=20, pady=(20, 5))
+        self.grid_rowconfigure((0, 1, 2, 3, 4, 5), weight=1)
+        self.columnconfigure(0, weight=1)
 
-        self.window.mainloop()
+        """ Table sheet data text """
+        self.table_data_label = customtkinter.CTkLabel(self, text="Data from Google Sheet", font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.table_data_label.grid(row=1, column=0, sticky="w", padx=30, pady=0)
+        self.table_data = customtkinter.CTkTextbox(self, width=900)
+        self.table_data.grid(row=2, column=0, sticky="nsew", padx=30, pady=(5, 20))
+
+        """ Table new data text """
+        self.table_new_label = customtkinter.CTkLabel(self, text="New user date", font=customtkinter.CTkFont(size=20, weight="bold"))
+        self.table_new_label.grid(row=3, column=0, sticky="w", padx=30, pady=0)
+        self.table_new = customtkinter.CTkTextbox(self, width=900)
+        self.table_new.grid(row=4, column=0, sticky="nsew", padx=30, pady=(5, 20))
+
+        """ Table with buttons, entries and labels"""
+        self.table_interface = customtkinter.CTkFrame(self, width=900)
+        self.table_interface.grid(row=5, column=0, sticky="nsew", padx=30, pady=20)
+        self.table_interface.columnconfigure((0, 1, 2), weight=1)
+        
+        """ Labels """
+        self.city_from_label = customtkinter.CTkLabel(self.table_interface, text="Departure City:", font=customtkinter.CTkFont(size=30, weight="bold"))
+        self.city_from_label.grid(row=0, column=0, padx=20, pady=30)
+        self.city_to_label = customtkinter.CTkLabel(self.table_interface, text="Destination City:", font=customtkinter.CTkFont(size=30, weight="bold"))
+        self.city_to_label.grid(row=1, column=0, padx=20, pady=30)
+        self.how_many_days_label = customtkinter.CTkLabel(self.table_interface, text="Trip Days +-1:", font=customtkinter.CTkFont(size=30, weight="bold"))
+        self.how_many_days_label.grid(row=2, column=0, padx=20, pady=30)
+
+        """ Entries """
+        self.city_from_entry = customtkinter.CTkEntry(self.table_interface, width=250, font=customtkinter.CTkFont(size=30, weight="bold"), placeholder_text="Gdansk")
+        self.city_from_entry.grid(row=0, column=1, padx=20, pady=30)
+        self.city_to_entry = customtkinter.CTkEntry(self.table_interface, width=250, font=customtkinter.CTkFont(size=30, weight="bold"))
+        self.city_to_entry.grid(row=1, column=1, padx=20, pady=30)
+        self.how_many_days_entry = customtkinter.CTkEntry(self.table_interface, width=250, font=customtkinter.CTkFont(size=30, weight="bold"))
+        self.how_many_days_entry.grid(row=2, column=1, padx=20, pady=30)
+        
+        """ Buttons """
+        self.add_button = customtkinter.CTkButton(self.table_interface, text="ADD Data", font=customtkinter.CTkFont(size=30, weight="bold"), command=self.add_user_data)
+        self.add_button.grid(row=0, column=2, padx=20, pady=30)
+        self.open_sheet_button = customtkinter.CTkButton(self.table_interface, text="Open Sheet", font=customtkinter.CTkFont(size=30, weight="bold"), command=self.go_to_sheet)
+        self.open_sheet_button.grid(row=1, column=2, padx=20, pady=30)
+        self.search_button = customtkinter.CTkButton(self.table_interface, text="Let's search", font=customtkinter.CTkFont(size=30, weight="bold"), command=self.funk_to_start)
+        self.search_button.grid(row=2, column=2, padx=20, pady=30)
         
     def add_user_data(self):
         """ Command for button to add user data in Google Sheet """
@@ -75,13 +88,25 @@ class CityQueryInterface():
             messagebox.showinfo(title=title, message=message)
         else:
             self.funk_to_upload(self.sheet_list, city_from, city_to, days)
-            self.city_from_entry.delete(0, "end")
+            information = f"Departure City: {city_from}\nDestination City: {city_to}\nTrip Days: {days}\n\n"
+            self.table_new.insert("0.0", f"{information}")
             self.city_to_entry.delete(0, "end")
             self.how_many_days_entry.delete(0, "end")
-            self.city_from_entry.insert(0, YOUR_CITY)
 
     def go_to_sheet(self):
         webbrowser.open(self.sheet_url)
 
     def show_error(self, title_error, message_error):
         messagebox.showinfo(title=title_error, message=message_error)
+
+    def sheet_to_table(self, data):
+        city_from = data['departureCity']
+        iata_from = data['departureIataCode']
+        city_to = data['destinationCity']
+        iata_to = data['destinationIataCode']
+        date_from = data['departureDate']
+        date_back = data['returnDate']
+        days = data['tripDays']
+        cost = data['lowestPrice']
+        id = data['id']
+        self.table_data.insert("0.0", f"Departure City: {city_from}\nDeparture Iata Code: {iata_from}\nDestination City: {city_to}\nDestination Iata Code: {iata_to}\nDeparture Date: {date_from}\nReturn Date: {date_back}\nTrip Days: {days}\nLowest Price: {cost}\nId: {id}\n\n")
