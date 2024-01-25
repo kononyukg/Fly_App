@@ -1,4 +1,3 @@
-from tkinter import *
 import webbrowser
 from tkinter import messagebox
 import customtkinter
@@ -76,6 +75,7 @@ class CityQueryInterface(customtkinter.CTk):
         self.open_sheet_button.grid(row=1, column=2, padx=20, pady=30)
         self.search_button = customtkinter.CTkButton(self.table_interface, text="Let's search", font=customtkinter.CTkFont(size=30, weight="bold"), command=self.funk_to_start)
         self.search_button.grid(row=2, column=2, padx=20, pady=30)
+
         
     def add_user_data(self):
         """ Command for button to add user data in Google Sheet """

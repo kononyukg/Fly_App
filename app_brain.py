@@ -33,6 +33,7 @@ class AppBrain:
         self.iata_search = IataSearch(API_KEY, TEQ_LOCATION_API)
         self.flight_data = FlightData(API_KEY, TEQ_SEARCH_API)
         self.show_in_iterface()
+        self.city_query_interface.mainloop()
     
     def show_in_iterface(self):
         data_to_interface = self.data_manager.get_trips()
@@ -102,34 +103,30 @@ class AppBrain:
     def find_flight(self, sh_data):
         """ Find flights with user's parameters """
         for data in sh_data:
-            try:
-                departure_iata = data["departureIataCode"]
-                destination_iata = data["destinationIataCode"]
-                trip_days = data["tripDays"]
-                self.flight_data_search_fly_thread = threading.Thread(
-                    target=self.flight_data.search_fly,
-                    args=(departure_iata, destination_iata, trip_days,)
+            if data["lowestPrice"] == "":
+                try:
+                    departure_iata = data["departureIataCode"]
+                    destination_iata = data["destinationIataCode"]
+                    trip_days = data["tripDays"]
+                    self.flight_data_search_fly_thread = threading.Thread(
+                        target=self.flight_data.search_fly,
+                        args=(departure_iata, destination_iata, trip_days,)
+                        )
+                    self.flight_data_search_fly_thread.start()
+                    self.flight_data_search_fly_thread.join()
+                    self.check_prices(data)
+                    self.data_manager_update_sheet_thread = threading.Thread(
+                        target=self.data_manager.update_sheet,
+                        args=(sh_data,)
                     )
-                self.flight_data_search_fly_thread.start()
-                self.flight_data_search_fly_thread.join()
-                self.check_prices_thread = threading.Thread(
-                    target=self.check_prices,
-                    args=(data,)
-                    )
-                self.check_prices_thread.start()
-                self.check_prices_thread.join()
-                self.data_manager_update_sheet_thread = threading.Thread(
-                    target=self.data_manager.update_sheet,
-                    args=(sh_data,)
-                )
-                self.data_manager_update_sheet_thread.start()
-                self.data_manager_update_sheet_thread.join()     
-            except IndexError:
-                title = "Sorry"
-                message = ("There are no direct flights in this direction"
-                        "\nPlease enter another destination city.")
-                self.city_query_interface.show_error(title, message)
-                continue
+                    self.data_manager_update_sheet_thread.start()
+                    self.data_manager_update_sheet_thread.join()     
+                except IndexError:
+                    title = "Sorry"
+                    message = ("There are no direct flights in this direction"
+                            "\nPlease enter another destination city.")
+                    self.city_query_interface.show_error(title, message)
+                    continue
         for data in sh_data:
             if  data["lowestPrice"] == "":
                 row = data["id"]
