@@ -67,7 +67,7 @@ class InterfaceApp(customtkinter.CTk):
         self.email_entry = customtkinter.CTkEntry(self.table_sms_email, width=250, font=customtkinter.CTkFont(size=20, weight="bold"))
         self.email_entry.grid(row=1, column=0, padx=5, pady=0)
         self.email_entry.insert(0, YOUR_EMAIL_SMTP)
-        self.email_button = customtkinter.CTkButton(self.table_sms_email, text="SEND", font=customtkinter.CTkFont(size=30, weight="bold"), command=self.send_email)
+        self.email_button = customtkinter.CTkButton(self.table_sms_email, text="SEND", font=customtkinter.CTkFont(size=30, weight="bold"), command=self.send_email_command_button)
         self.email_button.grid(row=2, column=0, padx=10, pady=(10, 20), sticky="N")
 
         """ SMS interface """
@@ -76,7 +76,7 @@ class InterfaceApp(customtkinter.CTk):
         self.sms_entry = customtkinter.CTkEntry(self.table_sms_email, width=250, font=customtkinter.CTkFont(size=20, weight="bold"))
         self.sms_entry.grid(row=4, column=0, padx=5, pady=0)
         self.sms_entry.insert(0, YOUR_PHONE_NUMBER)
-        self.sms_button = customtkinter.CTkButton(self.table_sms_email, text="SEND", font=customtkinter.CTkFont(size=30, weight="bold"), command=self.send_sms)
+        self.sms_button = customtkinter.CTkButton(self.table_sms_email, text="SEND", font=customtkinter.CTkFont(size=30, weight="bold"), command=self.send_sms_command_button)
         self.sms_button.grid(row=5, column=0, padx=10, pady=(10, 20), sticky="N")
 
         """ Down Table with buttons, entries and labels"""
@@ -171,9 +171,10 @@ class InterfaceApp(customtkinter.CTk):
             self.dict_to_table(data, self.table_data)
 
     def open_sheet(self):
+        """ Open the Google Sheet in browser """
         webbrowser.open(YOUR_SHEET_URL)
 
-    def send_sms(self):
+    def send_sms_command_button(self):
         you_phone_number = self.sms_entry.get()
         message_to_send = (f"Low price alert! Only {search_flight_data.price} EUR to fly," 
                             f"\nfrom {search_flight_data.departure_city}-{search_flight_data.departure_airport_code}"
@@ -181,7 +182,7 @@ class InterfaceApp(customtkinter.CTk):
                             f"\nfrom {search_flight_data.date_to_fly} to {search_flight_data.date_comeback_fly}.")
         message_manager.send_message(you_phone_number, message_to_send)
 
-    def send_email(self):
+    def send_email_command_button(self):
         message_to_send = (f"Low price alert! Only {search_flight_data.price} EUR to fly," 
                             f"\nfrom {search_flight_data.departure_city}-{search_flight_data.departure_airport_code}"
                             f" to {search_flight_data.destination_city}-{search_flight_data.arrival_airport_code},"

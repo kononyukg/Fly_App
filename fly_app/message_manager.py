@@ -35,5 +35,5 @@ class MessageManager:
             connection.sendmail(
                 from_addr=YOUR_EMAIL_SMTP,
                 to_addrs=you_email,
-                msg=f"Subject:Trip from {departure_city} to "f"{destination_city}!\n\n{message_to_send}\nlink:{url}"
+                msg=(f"Subject:Trip from {departure_city} to "f"{destination_city}!\n\n{message_to_send}\nlink:{url}").encode("utf-8")
             )

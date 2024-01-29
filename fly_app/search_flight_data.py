@@ -85,6 +85,6 @@ class SearchFlightData:
             'departureDate': self.date_to_fly, 
             'returnDate': self.date_comeback_fly, 
             'tripDays': self.nights_in_destination, 
-            'lowestPrice': f"{self.price} EUR", 
+            'lowestPrice': self.price, 
             }
         return sheet_dict
