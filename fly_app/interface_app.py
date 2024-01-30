@@ -89,7 +89,7 @@ class InterfaceApp(customtkinter.CTk):
         self.city_from_label.grid(row=0, column=0, padx=20, pady=30)
         self.city_to_label = customtkinter.CTkLabel(self.table_interface, text="Destination City:", font=customtkinter.CTkFont(size=30, weight="bold"))
         self.city_to_label.grid(row=1, column=0, padx=20, pady=30)
-        self.how_many_days_label = customtkinter.CTkLabel(self.table_interface, text="Trip Days +-1:", font=customtkinter.CTkFont(size=30, weight="bold"))
+        self.how_many_days_label = customtkinter.CTkLabel(self.table_interface, text="Days on the trip +-1:", font=customtkinter.CTkFont(size=30, weight="bold"))
         self.how_many_days_label.grid(row=2, column=0, padx=20, pady=30)
 
         """ Down Entries """
@@ -175,20 +175,33 @@ class InterfaceApp(customtkinter.CTk):
         webbrowser.open(YOUR_SHEET_URL)
 
     def send_sms_command_button(self):
-        you_phone_number = self.sms_entry.get()
-        message_to_send = (f"Low price alert! Only {search_flight_data.price} EUR to fly," 
-                            f"\nfrom {search_flight_data.departure_city}-{search_flight_data.departure_airport_code}"
-                            f" to {search_flight_data.destination_city}-{search_flight_data.arrival_airport_code},"
-                            f"\nfrom {search_flight_data.date_to_fly} to {search_flight_data.date_comeback_fly}.")
-        message_manager.send_message(you_phone_number, message_to_send)
+        if search_flight_data.departure_city == None:
+            CTkMessagebox(title="Information", message="No data to send")
+        else:
+            you_phone_number = self.sms_entry.get()
+            message_to_send = (f"Low price alert! Only {search_flight_data.price} EUR to fly," 
+                                f"\nfrom {search_flight_data.departure_city}-{search_flight_data.departure_airport_code}"
+                                f" to {search_flight_data.destination_city}-{search_flight_data.arrival_airport_code},"
+                                f"\nfrom {search_flight_data.date_to_fly} to {search_flight_data.date_comeback_fly}.")
+            try:
+                message_manager.send_message(you_phone_number, message_to_send)
+            except:
+                # upgrade Twilio account
+                CTkMessagebox(title="Warning Message!", icon="warning", message="Perhaps the wrong phone number.")
 
     def send_email_command_button(self):
-        message_to_send = (f"Low price alert! Only {search_flight_data.price} EUR to fly," 
-                            f"\nfrom {search_flight_data.departure_city}-{search_flight_data.departure_airport_code}"
-                            f" to {search_flight_data.destination_city}-{search_flight_data.arrival_airport_code},"
-                            f"\nfrom {search_flight_data.date_to_fly} to {search_flight_data.date_comeback_fly}.")
-        you_email = self.email_entry.get()
-        departure_city = search_flight_data.departure_city
-        destination_city = search_flight_data.destination_city
-        url = search_flight_data.deep_link
-        message_manager.send_email(message_to_send, you_email, departure_city, destination_city, url)
+        if search_flight_data.departure_city == None:
+            CTkMessagebox(title="Information", message="No data to send")
+        else:
+            message_to_send = (f"Low price alert! Only {search_flight_data.price} EUR to fly," 
+                                f"\nfrom {search_flight_data.departure_city}-{search_flight_data.departure_airport_code}"
+                                f" to {search_flight_data.destination_city}-{search_flight_data.arrival_airport_code},"
+                                f"\nfrom {search_flight_data.date_to_fly} to {search_flight_data.date_comeback_fly}.")
+            you_email = self.email_entry.get()
+            departure_city = search_flight_data.departure_city
+            destination_city = search_flight_data.destination_city
+            url = search_flight_data.deep_link
+            try:
+                message_manager.send_email(message_to_send, you_email, departure_city, destination_city, url)
+            except:
+                CTkMessagebox(title="Warning Message!", icon="warning", message="Perhaps the wrong email.")
