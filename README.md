@@ -89,10 +89,36 @@ There are windows in the interface that show the history of search results, the 
     ```
 ## Usage
 1. Enter Departure city, Destination city and Days on the Trip
+   ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/menu.png)
+   ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/pop_up.png)
 2. Press "ADD Data"
    * The entered data will appear in the "New search request" 
+   ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/add.png)
 3. Press "Let's search"
    * Result data will appear in the "Search result"
+   ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/result.png)
 4. Now you can send an SMS with the data
    * You can send data only to your phone number, because Twilio account is free
+   ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/sms.jpg)
 5. Also you can send an email with the data and booking link
+   ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/warning.png)
+   ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/link.png)
+   ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/link_result.png)
+6. Press "Open Sheet"
+   ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/sheet.png)
+7. Also you can check prices awery day automatically
+   * Sing in at [https://www.pythonanywhere.com/](https://www.pythonanywhere.com/)
+   * Upload Files 
+   ```sh
+   auto_check.py
+   google_sheet_data.py
+   message_manager.py
+   search_flight_data.py
+   ```
+   * In this files delite "import os", "from dotenv import load_dotenv" and "load_dotenv()"
+   * Then put the values of the constants insted of "os.environ.get(...)"
+   * Create new console
+   * Create new Task, set a time and take the command from below
+   ```sh
+   python3 auto_check.py
+   ```
