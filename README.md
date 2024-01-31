@@ -100,7 +100,7 @@ There are windows in the interface that show the history of search results, the 
 4. Now you can send an SMS with the data
    * You can send data only to your phone number, because Twilio account is free
    ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/sms.jpg)
-5. Also you can send an email with the data and booking link
+5. Also you can send an email with the data and booking link, only Gmail
    ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/warning.png)
    ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/link.png)
    ![alt text](https://github.com/kononyukg/Fly_App/blob/master/fly_app/img_read/link_result.png)

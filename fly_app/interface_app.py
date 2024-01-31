@@ -185,6 +185,7 @@ class InterfaceApp(customtkinter.CTk):
                                 f"\nfrom {search_flight_data.date_to_fly} to {search_flight_data.date_comeback_fly}.")
             try:
                 message_manager.send_message(you_phone_number, message_to_send)
+                CTkMessagebox(message="Message was sent successfully.", icon="check", option_1="Thanks")
             except:
                 # upgrade Twilio account
                 CTkMessagebox(title="Warning Message!", icon="warning", message="Perhaps the wrong phone number.")
@@ -203,5 +204,6 @@ class InterfaceApp(customtkinter.CTk):
             url = search_flight_data.deep_link
             try:
                 message_manager.send_email(message_to_send, you_email, departure_city, destination_city, url)
+                CTkMessagebox(message="Email was sent successfully.", icon="check", option_1="Thanks")
             except:
-                CTkMessagebox(title="Warning Message!", icon="warning", message="Perhaps the wrong email.")
+                CTkMessagebox(title="Warning Message!", icon="warning", message="Perhaps the wrong email.\nTry to send it to Google mail(@gmail.com)")
